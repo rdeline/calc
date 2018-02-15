@@ -1,18 +1,20 @@
 import * as React from "react";
-import { Button } from "./button";
-import { TextBox } from "./textbox";
 import { observable } from "mobx";
 import { observer } from "mobx-react";
 
 @observer
 export class Calculator extends React.Component {
     @observable private answer: string = "0";
-    private savedOp: (x: number) => number = undefined;
+    private savedOp: { op: string, arg: number } = undefined;
+    private resetAnswer = true;
 
     public render() {
-        const numeral = (label: string) => {
-            if (this.answer === '0') { this.answer = ''; }
+
+        const numeral = (e: React.MouseEvent<HTMLButtonElement>) => {
+            const label = e.currentTarget.innerText;
+            if (this.resetAnswer) { this.answer = ''; }
             this.answer += label;
+            this.resetAnswer = false;
         }
 
         const dot = () => {
@@ -21,31 +23,37 @@ export class Calculator extends React.Component {
             }
         }
 
-        const operation = (label: string) => {
-            const currentAnswer = parseInt(this.answer);
-            this.answer = this.savedOp ? this.savedOp(currentAnswer).toString() : '0';
-            switch (label) {
-                case '+': this.savedOp = n => currentAnswer + n; break;
-                case '-': this.savedOp = n => currentAnswer - n; break;
-                case '×': this.savedOp = n => currentAnswer * n; break;
-                case '÷': this.savedOp = n => currentAnswer / n; break;
-                case '=': this.savedOp = undefined; break;
-                default: break;
+        const operation = (e: React.MouseEvent<HTMLButtonElement>) => {
+            const label = e.currentTarget.innerText;
+            let currentAnswer = parseInt(this.answer);
+            if (this.savedOp) {
+                switch (this.savedOp.op) {
+                    case '+': currentAnswer = this.savedOp.arg + currentAnswer; break;
+                    case '-': currentAnswer = this.savedOp.arg - currentAnswer; break;
+                    case '×': currentAnswer = this.savedOp.arg * currentAnswer; break;
+                    case '÷': currentAnswer = this.savedOp.arg / currentAnswer; break;
+                    default: break;
+                }
             }
-        }
-
-        const clear = () => {
-            this.answer = "0";
-            this.savedOp = undefined;
+            this.answer = currentAnswer.toString();
+            this.savedOp = label === '=' ? undefined : { op: label, arg: currentAnswer };
+            this.resetAnswer = true;
         }
 
         const clearEntry = () => {
             this.answer = "0";
+            this.resetAnswer = true;
+        }
+
+        const clear = () => {
+            clearEntry();
+            this.savedOp = undefined;
         }
 
         const backspace = () => {
             if (this.answer.length === 1) {
                 this.answer = "0";
+                this.resetAnswer = true;
             } else {
                 this.answer = this.answer.substring(0, this.answer.length - 1);
             }
@@ -64,37 +72,37 @@ export class Calculator extends React.Component {
                 <table>
                     <tbody>
                         <tr>
-                            <td colSpan={4} className="right"><TextBox value={this.answer.toString()} /></td>
+                            <td colSpan={4} className="right"><div>{this.answer}</div></td>
                         </tr>
                         <tr>
-                            <td><Button label="CE" onClick={clearEntry} /></td>
-                            <td><Button label="C" onClick={clear} /></td>
-                            <td><Button label="◄" onClick={backspace} /></td>
-                            <td><Button label="÷" onClick={operation} /></td>
+                            <td><button onClick={clearEntry}>CE</button></td>
+                            <td><button onClick={clear}>C</button></td>
+                            <td><button onClick={backspace}>◄</button></td>
+                            <td><button onClick={operation}>÷</button></td>
                         </tr>
                         <tr>
-                            <td><Button label="7" onClick={numeral} /></td>
-                            <td><Button label="8" onClick={numeral} /></td>
-                            <td><Button label="9" onClick={numeral} /></td>
-                            <td><Button label="×" onClick={operation} /></td>
+                            <td><button onClick={numeral}>7</button></td>
+                            <td><button onClick={numeral}>8</button></td>
+                            <td><button onClick={numeral}>9</button></td>
+                            <td><button onClick={operation}>×</button></td>
                         </tr>
                         <tr>
-                            <td><Button label="4" onClick={numeral} /></td>
-                            <td><Button label="5" onClick={numeral} /></td>
-                            <td><Button label="6" onClick={numeral} /></td>
-                            <td><Button label="-" onClick={operation} /></td>
+                            <td><button onClick={numeral}>4</button></td>
+                            <td><button onClick={numeral}>5</button></td>
+                            <td><button onClick={numeral}>6</button></td>
+                            <td><button onClick={operation}>-</button></td>
                         </tr>
                         <tr>
-                            <td><Button label="1" onClick={numeral} /></td>
-                            <td><Button label="2" onClick={numeral} /></td>
-                            <td><Button label="3" onClick={numeral} /></td>
-                            <td><Button label="+" onClick={operation} /></td>
+                            <td><button onClick={numeral}>1</button></td>
+                            <td><button onClick={numeral}>2</button></td>
+                            <td><button onClick={numeral}>3</button></td>
+                            <td><button onClick={operation}>+</button></td>
                         </tr>
                         <tr>
-                            <td><Button label="±" onClick={negation} /></td>
-                            <td><Button label="0" onClick={numeral} /></td>
-                            <td><Button label="." onClick={dot} /></td>
-                            <td><Button label="=" onClick={operation} /></td>
+                            <td><button onClick={negation}>±</button></td>
+                            <td><button onClick={numeral}>0</button></td>
+                            <td><button onClick={dot}>.</button></td>
+                            <td><button onClick={operation}>=</button></td>
                         </tr>
                     </tbody>
                 </table>
