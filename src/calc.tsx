@@ -4,28 +4,28 @@ import { observer } from "mobx-react";
 
 @observer
 export class Calculator extends React.Component {
-    @observable private answer: string = "0";
+    @observable private display: string = "0";
     private savedOp: { op: string, arg: number } = undefined;
-    private resetAnswer = true;
+    private resetDisplay = true;
 
     public render() {
 
         const numeral = (e: React.MouseEvent<HTMLButtonElement>) => {
             const label = e.currentTarget.innerText;
-            if (this.resetAnswer) { this.answer = ''; }
-            this.answer += label;
-            this.resetAnswer = false;
+            if (this.resetDisplay) { this.display = ''; }
+            this.display += label;
+            this.resetDisplay = false;
         }
 
         const dot = () => {
-            if (this.answer.indexOf('.') < 0) {
-                this.answer += '.';
+            if (this.display.indexOf('.') < 0) {
+                this.display += '.';
             }
         }
 
         const operation = (e: React.MouseEvent<HTMLButtonElement>) => {
             const label = e.currentTarget.innerText;
-            let currentAnswer = parseInt(this.answer);
+            let currentAnswer = parseInt(this.display);
             if (this.savedOp) {
                 switch (this.savedOp.op) {
                     case '+': currentAnswer = this.savedOp.arg + currentAnswer; break;
@@ -35,14 +35,14 @@ export class Calculator extends React.Component {
                     default: break;
                 }
             }
-            this.answer = currentAnswer.toString();
+            this.display = currentAnswer.toString();
             this.savedOp = label === '=' ? undefined : { op: label, arg: currentAnswer };
-            this.resetAnswer = true;
+            this.resetDisplay = true;
         }
 
         const clearEntry = () => {
-            this.answer = "0";
-            this.resetAnswer = true;
+            this.display = "0";
+            this.resetDisplay = true;
         }
 
         const clear = () => {
@@ -51,19 +51,19 @@ export class Calculator extends React.Component {
         }
 
         const backspace = () => {
-            if (this.answer.length === 1) {
-                this.answer = "0";
-                this.resetAnswer = true;
+            if (this.display.length === 1) {
+                this.display = "0";
+                this.resetDisplay = true;
             } else {
-                this.answer = this.answer.substring(0, this.answer.length - 1);
+                this.display = this.display.substring(0, this.display.length - 1);
             }
         };
 
         const negation = () => {
-            if (this.answer[0] === '-') {
-                this.answer = this.answer.substring(1);
-            } else if (this.answer !== '0') {
-                this.answer = '-' + this.answer;
+            if (this.display[0] === '-') {
+                this.display = this.display.substring(1);
+            } else if (this.display !== '0') {
+                this.display = '-' + this.display;
             }
         };
 
@@ -72,7 +72,7 @@ export class Calculator extends React.Component {
                 <table>
                     <tbody>
                         <tr>
-                            <td colSpan={4} className="right"><div>{this.answer}</div></td>
+                            <td colSpan={4} className="right"><div>{this.display}</div></td>
                         </tr>
                         <tr>
                             <td><button onClick={clearEntry}>CE</button></td>
