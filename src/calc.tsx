@@ -5,38 +5,45 @@ import { observer } from "mobx-react";
 @observer
 export class Calculator extends React.Component {
     @observable private display: string = "0";
-    private savedOp: { op: string, arg: number } = undefined;
+    private pending: { operation: string, num: number } = undefined;
     private resetDisplay = true;
 
     public render() {
 
         const numeral = (e: React.MouseEvent<HTMLButtonElement>) => {
-            const label = e.currentTarget.innerText;
-            if (this.resetDisplay) { this.display = ''; }
-            this.display += label;
+            const digit = e.currentTarget.innerText;
+            if (this.resetDisplay) {
+                this.display = digit;
+            } else {
+                this.display += digit;
+            }
             this.resetDisplay = false;
         }
 
         const dot = () => {
+            if (this.resetDisplay) {
+                this.display = "0";
+            }
             if (this.display.indexOf('.') < 0) {
                 this.display += '.';
+                this.resetDisplay = false;
             }
         }
 
         const operation = (e: React.MouseEvent<HTMLButtonElement>) => {
-            const label = e.currentTarget.innerText;
-            let currentAnswer = parseInt(this.display);
-            if (this.savedOp) {
-                switch (this.savedOp.op) {
-                    case '+': currentAnswer = this.savedOp.arg + currentAnswer; break;
-                    case '-': currentAnswer = this.savedOp.arg - currentAnswer; break;
-                    case '×': currentAnswer = this.savedOp.arg * currentAnswer; break;
-                    case '÷': currentAnswer = this.savedOp.arg / currentAnswer; break;
+            const operation = e.currentTarget.innerText;
+            let num = parseFloat(this.display);
+            if (this.pending) {
+                switch (this.pending.operation) {
+                    case '+': num = this.pending.num + num; break;
+                    case '-': num = this.pending.num - num; break;
+                    case '×': num = this.pending.num * num; break;
+                    case '÷': num = this.pending.num / num; break;
                     default: break;
                 }
             }
-            this.display = currentAnswer.toString();
-            this.savedOp = label === '=' ? undefined : { op: label, arg: currentAnswer };
+            this.display = num.toString().substring(0, 12);
+            this.pending = operation === '=' ? undefined : { operation: operation, num: num };
             this.resetDisplay = true;
         }
 
@@ -47,7 +54,7 @@ export class Calculator extends React.Component {
 
         const clear = () => {
             clearEntry();
-            this.savedOp = undefined;
+            this.pending = undefined;
         }
 
         const backspace = () => {
@@ -72,7 +79,7 @@ export class Calculator extends React.Component {
                 <table>
                     <tbody>
                         <tr>
-                            <td colSpan={4} className="right"><div>{this.display}</div></td>
+                            <td colSpan={4} className="display"><div>{this.display}</div></td>
                         </tr>
                         <tr>
                             <td><button onClick={clearEntry}>CE</button></td>
