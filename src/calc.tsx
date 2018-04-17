@@ -10,7 +10,7 @@ export class Calculator extends React.Component {
 
     public render() {
 
-        const numeral = (e: React.MouseEvent<HTMLButtonElement>) => {
+        const digit = (e: React.MouseEvent<HTMLButtonElement>) => {
             const digit = e.currentTarget.innerText;
             if (this.resetDisplay) {
                 this.display = digit;
@@ -18,6 +18,12 @@ export class Calculator extends React.Component {
                 this.display += digit;
             }
             this.resetDisplay = false;
+        }
+
+        const zero = () => {
+            if (this.display !== "0") {
+                this.display += "0";
+            }
         }
 
         const dot = () => {
@@ -88,26 +94,26 @@ export class Calculator extends React.Component {
                             <td><button onClick={operation}>÷</button></td>
                         </tr>
                         <tr>
-                            <td><button onClick={numeral}>7</button></td>
-                            <td><button onClick={numeral}>8</button></td>
-                            <td><button onClick={numeral}>9</button></td>
+                            <td><button onClick={digit}>7</button></td>
+                            <td><button onClick={digit}>8</button></td>
+                            <td><button onClick={digit}>9</button></td>
                             <td><button onClick={operation}>×</button></td>
                         </tr>
                         <tr>
-                            <td><button onClick={numeral}>4</button></td>
-                            <td><button onClick={numeral}>5</button></td>
-                            <td><button onClick={numeral}>6</button></td>
+                            <td><button onClick={digit}>4</button></td>
+                            <td><button onClick={digit}>5</button></td>
+                            <td><button onClick={digit}>6</button></td>
                             <td><button onClick={operation}>-</button></td>
                         </tr>
                         <tr>
-                            <td><button onClick={numeral}>1</button></td>
-                            <td><button onClick={numeral}>2</button></td>
-                            <td><button onClick={numeral}>3</button></td>
+                            <td><button onClick={digit}>1</button></td>
+                            <td><button onClick={digit}>2</button></td>
+                            <td><button onClick={digit}>3</button></td>
                             <td><button onClick={operation}>+</button></td>
                         </tr>
                         <tr>
                             <td><button onClick={negation}>±</button></td>
-                            <td><button onClick={numeral}>0</button></td>
+                            <td><button onClick={zero}>0</button></td>
                             <td><button onClick={dot}>.</button></td>
                             <td><button onClick={operation}>=</button></td>
                         </tr>
